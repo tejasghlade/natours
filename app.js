@@ -1,21 +1,28 @@
-const express = require('express')
+const express = require('express');
 
+const morgan = require('morgan');
 
+const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoutes')
 
 const app = express();
 
-// app.get('/',(req,res) => {
-//     res.status(200).json({ message : 'Hello from the server side ', app : 'Natours' })
-// })
+// Middlewares
+app.use(morgan('dev'));
+app.use(express.json());
 
-// app.post('/',(req,res) => {
-//     res.send('You can post to this endpoint...')
-// })
+app.use((req, res, next) => {
+    console.log('Hello from the middleware 👍');
+    next();
+});
 
-app.get('api/v1/tours')
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    next();
+});
 
-const port = 3000;
+//  Routes
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-app.listen(port,() => {
-    console.log(`App running on port ${port}`)
-})
+module.exports = app;
